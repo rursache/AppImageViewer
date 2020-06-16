@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AppImageViewer'
-  s.version          = '1.6.5.1'
+  s.version          = '1.6.6'
   s.swift_version    = '5.0'
   s.summary          = 'A great framework to viewer you images gracefully.'
   s.description      = "Image viewing will be great with this. really fun. all you need plug and and play with your waves. yay yay. simple isn't it !!"

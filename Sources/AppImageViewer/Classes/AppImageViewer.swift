@@ -44,6 +44,7 @@ open class AppImageViewer: UIViewController {
     open var isCustomShare: Bool = true
     open var enableZoomBlackArea: Bool = false
     open var disableVerticalSwipe: Bool = false
+	open var showPageDots: Bool = true
     open var bgColor: UIColor = .black
     
     // open function
@@ -72,6 +73,9 @@ open class AppImageViewer: UIViewController {
     
     // timer
     fileprivate var controlVisibilityTimer: Timer!
+	
+	// page dots
+	fileprivate var pageControl = UIPageControl()
     
     // delegate
     open weak var delegate: AppImageViewerDelegate?
@@ -183,6 +187,7 @@ open class AppImageViewer: UIViewController {
         configureGestureControl()
         configureActionView()
         configureToolbar()
+		configurePageControl()
         
         animator.willPresent(self)
     }
@@ -192,7 +197,7 @@ open class AppImageViewer: UIViewController {
         view.setNeedsLayout()
     }
     
-    open func performLayout() {        
+    open func performLayout() {
         isPerformingLayout = true
 
         // reset local cache
@@ -210,6 +215,24 @@ open class AppImageViewer: UIViewController {
         view.removeGestureRecognizer(panGesture)
         NSObject.cancelPreviousPerformRequests(withTarget: self)
     }
+	
+	open func configurePageControl() {
+		if !self.showPageDots || self.photos.count < 2 {
+			return
+		}
+		
+		self.pageControl = UIPageControl(frame: CGRect(x: UIScreen.main.bounds.maxX / 2 - 45, y: UIScreen.main.bounds.maxY - 120 - 35, width: 90, height: 30))
+		self.pageControl.numberOfPages = self.photos.count
+		self.pageControl.currentPage = 0
+		self.pageControl.alpha = 0.8
+		self.pageControl.tintColor = UIColor.black
+		self.pageControl.pageIndicatorTintColor = UIColor.lightGray
+		self.pageControl.currentPageIndicatorTintColor = UIColor.white
+		self.pageControl.layer.cornerRadius = 12
+		self.pageControl.layer.masksToBounds = true
+				
+		self.view.addSubview(self.pageControl)
+	}
     
     open func dismissPhotoBrowser(animated: Bool, completion: (() -> Void)? = nil) {
         prepareForClosePhotoBrowser()
@@ -290,6 +313,7 @@ public extension AppImageViewer {
             let pageFrame = frameForPageAtIndex(index)
             pagingScrollView.jumpToPageAtIndex(pageFrame)
         }
+		
         hideControlsAfterDelay()
     }
     
@@ -528,7 +552,7 @@ private extension AppImageViewer {
     }
     
     func configureToolbar() {
-        toolbar = ViewerToolbar(frame: frameForToolbarAtOrientation(), browser: self)    
+        toolbar = ViewerToolbar(frame: frameForToolbarAtOrientation(), browser: self)
         toolbar.backgroundColor = .clear
         view.addSubview(toolbar)
     }
@@ -567,6 +591,7 @@ extension AppImageViewer: UIScrollViewDelegate {
         
         if currentPageIndex != previousCurrentPage {
             delegate?.didShowPhotoAtIndex(self, index: currentPageIndex)
+			self.pageControl.currentPage = currentPageIndex
         }
     }
     
